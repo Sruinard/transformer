@@ -1,0 +1,33 @@
+image: python:3.6
+pipelines:
+  default:
+  - parallel:
+    - step:
+        caches:
+        - pip
+        name: bandit all files
+        script:
+        - pip install bandit
+        - bandit -r .
+    - step:
+        caches:
+        - pip
+        name: pylint transformer
+        script:
+        - pip install pylint
+        - pip install -r transformer/requirements.txt
+        - python pylint.py --module transformer
+    - step:
+        caches:
+        - pip
+        name: license check transformer
+        script:
+        - apt-get update && apt-get install -y
+        - apt-get install jq -y
+        - export ACCESS_TOKEN=$(curl -s -X POST -u "$OAUTH_CLIENT_KEY:$OAUTH_CLIENT_SECRET
+          https://bitbucket.org/site/oauth2/access_token -d grant_type=client_credentials
+          -d scopes="repository" | jq --raw-output ".access_token")
+        - pip install git+https://x-token-auth:$ACCESS_TOKEN@bitbucket.org/ml6team/license-checker.git
+          --upgrade
+        - pip install -r test/requirements.txt
+        - license_check -r test/requirements.txt
