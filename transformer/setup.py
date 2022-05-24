@@ -8,7 +8,7 @@ from setuptools import find_packages
 from setuptools import setup
 
 # Any special required packages
-REQUIRED_PACKAGES = ['tensorflow==2.1.0']
+REQUIRED_PACKAGES = ['tensorflow==2.6.4']
 
 setup(
     name='trainer',
